@@ -11,6 +11,7 @@
 namespace tests\evangelion1204\Normalizer;
 
 
+use evangelion1204\Normalizer\ArrayNormalizer;
 use evangelion1204\Normalizer\TypifiedNormalizer;
 use evangelion1204\Serializer\TypifiedSerializer;
 use Symfony\Component\Serializer\Serializer;
@@ -32,11 +33,11 @@ class TypifiedSerializerTest extends \PHPUnit_Framework_TestCase
 	/**
 	 * @dataProvider defaultDataProvider
 	 */
-	public function _testDenormalize($expected, $src)
+	public function testDenormalize($expected, $src)
 	{
-		$serializer = new Serializer(array(new TypifiedNormalizer()));
+		$serializer = new TypifiedSerializer(array(new TypifiedNormalizer(), new ArrayNormalizer()));
 
-		$this->assertEquals($expected, $serializer->denormalize($src, ''));
+		$this->assertEquals($expected, $serializer->denormalize($src));
 	}
 
 	public function defaultDataProvider()
