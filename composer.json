@@ -1,0 +1,27 @@
+{
+  "name": "evangelion1204/typified-serializer",
+  "description": "description_text",
+  "minimum-stability": "stable",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Michael Iwersen",
+      "email": "mi.iwersen@gmail.com"
+    }
+  ],
+  "require": {
+    "symfony/serializer": "~2.7",
+    "symfony/property-access": "~2.7",
+    "phpunit/phpunit": "~4.7"
+  },
+  "autoload": {
+    "psr-0": {
+      "evangelion1204\\": "./src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-0": {
+      "tests\\evangelion1204\\": "./"
+    }
+  }
+}
