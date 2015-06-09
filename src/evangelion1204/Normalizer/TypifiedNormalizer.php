@@ -11,11 +11,22 @@
 namespace evangelion1204\Normalizer;
 
 
+use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
+use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\PropertyNormalizer;
+use Symfony\Component\Serializer\SerializerInterface;
 
-class TypifiedNormalizer extends PropertyNormalizer
+class TypifiedNormalizer extends AbstractNormalizer
 {
 	const META_CLASS = '__class__';
+
+	public function __construct(ClassMetadataFactoryInterface $classMetadataFactory = null, NameConverterInterface $nameConverter = null)
+	{
+		parent::__construct($classMetadataFactory, $nameConverter);
+
+		$this->propertyNormalizer = new PropertyNormalizer($classMetadataFactory, $nameConverter);
+	}
 
 	/**
 	 * {@inheritdoc}
@@ -23,9 +34,9 @@ class TypifiedNormalizer extends PropertyNormalizer
 	 */
 	public function normalize($object, $format = null, array $context = array())
 	{
-		$normalized = parent::normalize($object, $format, $context);
-
 		$class = get_class($object);
+
+		$normalized = $this->propertyNormalizer->normalize($object, $format, $context);
 
 		$normalized[self::META_CLASS] = $class;
 
@@ -37,25 +48,48 @@ class TypifiedNormalizer extends PropertyNormalizer
 	 *
 	 * @throws RuntimeException
 	 */
-
 	public function denormalize($data, $class = null, $format = null, array $context = array())
 	{
 		if ( !is_array($data) || !isset($data[self::META_CLASS]) ) {
 			return $data;
 		}
 
-		return parent::denormalize($data, $data[self::META_CLASS], $format, $context);
+		$class = $data[self::META_CLASS];
+		unset($data[self::META_CLASS]);
+
+		if ($class === 'stdClass') {
+			return $this->denormalizeStdClass($data, $format, $context);
+		}
+		else {
+			return $this->propertyNormalizer->denormalize($data, $class, $format, $context);
+		}
 	}
 
-	protected function prepareForDenormalization($data)
+	protected function denormalizeStdClass($data, $format = null, array $context = array(), $class = 'stdClass')
 	{
-		$normalizedData = parent::prepareForDenormalization($data);
+		$allowedAttributes = $this->getAllowedAttributes($class, $context, true);
+		$normalizedData = $this->prepareForDenormalization($data);
 
-		foreach ( $normalizedData as &$value ) {
-			$value = $this->denormalize($value);
+		$reflectionClass = new \ReflectionClass($class);
+		$object = $this->instantiateObject($normalizedData, $class, $context, $reflectionClass, $allowedAttributes);
+
+		foreach ($normalizedData as $attribute => $value) {
+			if ($this->nameConverter) {
+				$attribute = $this->nameConverter->denormalize($attribute);
+			}
+
+			$allowed = $allowedAttributes === false || in_array($attribute, $allowedAttributes);
+			$ignored = in_array($attribute, $this->ignoredAttributes);
+
+			if ($allowed && !$ignored) {
+				if (!is_scalar($value)) {
+					$value = $this->serializer->denormalize($value, $class, $format, $context);
+				}
+				$object->$attribute = $value;
+			}
 		}
 
-		return $normalizedData;
+		return $object;
 	}
 
 	/**
@@ -63,18 +97,29 @@ class TypifiedNormalizer extends PropertyNormalizer
 	 */
 	public function supportsNormalization($data, $format = null)
 	{
-		return (is_object($data) && get_class($data) == 'stdClass') || parent::supportsNormalization($data, $format);
+		return
+			(is_object($data) && get_class($data) == 'stdClass') ||
+			!$data instanceof \Traversable &&
+			!is_array($data) &&
+			!is_scalar($data);
 	}
 
+	/**
+	 * {@inheritdoc}
+	 */
+	public function supportsDenormalization($data, $type, $format = null)
+	{
+		return is_array($data) && isset($data[self::META_CLASS]);
+	}
 
-//	protected function isCircularReference($object, &$context)
-//	{
-//		if (!is_object($object)) {
-//			return false;
-//		}
-//
-//		return parent::isCircularReference($object, $context);
-//	}
+	/**
+	 * {@inheritdoc}
+	 */
+	public function setSerializer(SerializerInterface $serializer)
+	{
+		parent::setSerializer($serializer);
 
+		$this->propertyNormalizer->setSerializer($serializer);
+	}
 
 }
