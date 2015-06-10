@@ -12,7 +12,6 @@ namespace tests\evangelion1204\Normalizer;
 
 
 use evangelion1204\Normalizer\TypifiedNormalizer;
-use Symfony\Component\Serializer\Serializer;
 use tests\evangelion1204\Fixtures\FlatClass;
 
 class TypifiedNormalizerTest extends \PHPUnit_Framework_TestCase

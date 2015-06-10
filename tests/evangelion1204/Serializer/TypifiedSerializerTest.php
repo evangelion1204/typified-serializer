@@ -14,6 +14,7 @@ namespace tests\evangelion1204\Normalizer;
 use evangelion1204\Normalizer\ArrayNormalizer;
 use evangelion1204\Normalizer\TypifiedNormalizer;
 use evangelion1204\Serializer\TypifiedSerializer;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Serializer;
 use tests\evangelion1204\Fixtures\FlatClass;
 
@@ -33,11 +34,31 @@ class TypifiedSerializerTest extends \PHPUnit_Framework_TestCase
 	/**
 	 * @dataProvider defaultDataProvider
 	 */
+	public function testSerialize($src, $expected_array)
+	{
+		$serializer = new TypifiedSerializer(array(new TypifiedNormalizer()), array(new JsonEncoder()));
+
+		$this->assertEquals(json_encode($expected_array), $serializer->serialize($src, 'json'));
+	}
+
+	/**
+	 * @dataProvider defaultDataProvider
+	 */
 	public function testDenormalize($expected, $src)
 	{
 		$serializer = new TypifiedSerializer(array(new TypifiedNormalizer(), new ArrayNormalizer()));
 
 		$this->assertEquals($expected, $serializer->denormalize($src));
+	}
+
+	/**
+	 * @dataProvider defaultDataProvider
+	 */
+	public function testDeserialize($expected, $src_array)
+	{
+		$serializer = new TypifiedSerializer(array(new TypifiedNormalizer(), new ArrayNormalizer()), array(new JsonEncoder()));
+
+		$this->assertEquals($expected, $serializer->deserialize(json_encode($src_array), null, 'json'));
 	}
 
 	public function defaultDataProvider()
