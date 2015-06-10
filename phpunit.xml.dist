@@ -1,24 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<phpunit backupGlobals="true"
-		 backupStaticAttributes="false"
-		 bootstrap="vendor/autoload.php"
-		 colors="true"
-		 convertErrorsToExceptions="true"
-		 convertNoticesToExceptions="true"
-		 convertWarningsToExceptions="true"
-		 processIsolation="false"
-		 stopOnFailure="false"
-		 strict="true"
-		 verbose="true">
-
-	<php>
-		<ini name="error_reporting" value="-1" />
-	</php>
-
+<phpunit colors="true" bootstrap="vendor/autoload.php">
 	<testsuites>
-		<testsuite name="Serializer test-suite">
-			<directory>./tests/evangelion1204</directory>
+		<testsuite name="Serializer Test Suite">
+			<directory>tests</directory>
 		</testsuite>
 	</testsuites>
 
