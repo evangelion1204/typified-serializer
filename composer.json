@@ -1,6 +1,6 @@
 {
   "name": "evangelion1204/typified-serializer",
-  "description": "description_text",
+  "description": "A serializer to deep serialize all kind of classes and to deserialize them. Based on symfony/serializer",
   "minimum-stability": "stable",
   "license": "MIT",
   "authors": [
