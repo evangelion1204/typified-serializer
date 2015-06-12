@@ -16,6 +16,7 @@ use evangelion1204\Normalizer\TypifiedNormalizer;
 use evangelion1204\Serializer\TypifiedSerializer;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Serializer;
+use tests\evangelion1204\Fixtures\DeepClass;
 use tests\evangelion1204\Fixtures\FlatClass;
 
 class TypifiedSerializerTest extends \PHPUnit_Framework_TestCase
@@ -88,6 +89,25 @@ class TypifiedSerializerTest extends \PHPUnit_Framework_TestCase
 			TypifiedNormalizer::META_CLASS => 'stdClass'
 		);
 
+		$deepClass = new DeepClass();
+		$deepClass->setProtectedValue(1);
+
+		$nestedDeepClass = new DeepClass();
+		$nestedDeepClass->setProtectedValue(2);
+		$nestedDeepClass->setParent($deepClass);
+
+		$deepClassNormalized = array(
+			'protectedValue' => 1,
+			'parent' => null,
+			TypifiedNormalizer::META_CLASS => 'tests\evangelion1204\Fixtures\DeepClass',
+		);
+
+		$nestedDeepClassNormalized = array(
+			'protectedValue' => 2,
+			'parent' => $deepClassNormalized,
+			TypifiedNormalizer::META_CLASS => 'tests\evangelion1204\Fixtures\DeepClass',
+		);
+
 		return array(
 			array(array(), array()),
 			array(array('key' => 'value'), array('key' => 'value')),
@@ -97,7 +117,8 @@ class TypifiedSerializerTest extends \PHPUnit_Framework_TestCase
 			array($stdClass, $stdClassNormalized),
 			array($flatClass, $flatClassNormalized),
 			array(array($stdClass), array($stdClassNormalized)),
-			array($parentClass, $parentClassNormalized),
+			array($deepClass, $deepClassNormalized),
+			array($nestedDeepClass, $nestedDeepClassNormalized),
 		);
 	}
 

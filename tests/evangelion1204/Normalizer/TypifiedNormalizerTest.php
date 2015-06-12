@@ -12,6 +12,7 @@ namespace tests\evangelion1204\Normalizer;
 
 
 use evangelion1204\Normalizer\TypifiedNormalizer;
+use tests\evangelion1204\Fixtures\DeepClass;
 use tests\evangelion1204\Fixtures\FlatClass;
 
 class TypifiedNormalizerTest extends \PHPUnit_Framework_TestCase
@@ -54,9 +55,18 @@ class TypifiedNormalizerTest extends \PHPUnit_Framework_TestCase
 			TypifiedNormalizer::META_CLASS => 'tests\evangelion1204\Fixtures\FlatClass',
 		);
 
+		$deepClass = new DeepClass();
+		$deepClass->setProtectedValue(1);
+		$deepClassNormalized = array(
+			'protectedValue' => 1,
+			'parent' => null,
+			TypifiedNormalizer::META_CLASS => 'tests\evangelion1204\Fixtures\DeepClass',
+		);
+
 		return array(
 			array($stdClass, $stdClassNormalized),
 			array($flatClass, $flatClassNormalized),
+			array($deepClass, $deepClassNormalized),
 		);
 	}
 

@@ -61,8 +61,23 @@ class TypifiedNormalizer extends AbstractNormalizer
 			return $this->denormalizeStdClass($data, $format, $context);
 		}
 		else {
+			$data = $this->preProcessNested($data, $class, $format, $context);
 			return $this->propertyNormalizer->denormalize($data, $class, $format, $context);
 		}
+	}
+
+	protected function preProcessNested($data, $class = 'stdClass', $format = null, array $context = array())
+	{
+		$normalizedData = $this->prepareForDenormalization($data);
+
+		foreach ($normalizedData as $attribute => $value) {
+			if (!is_scalar($value) && !is_null($value)) {
+				$value = $this->serializer->denormalize($value, $class, $format, $context);
+			}
+			$normalizedData[$attribute] = $value;
+		}
+
+		return $normalizedData;
 	}
 
 	protected function denormalizeStdClass($data, $format = null, array $context = array(), $class = 'stdClass')
