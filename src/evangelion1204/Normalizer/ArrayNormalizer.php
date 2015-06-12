@@ -83,7 +83,7 @@ class ArrayNormalizer extends AbstractNormalizer
 				continue;
 			}
 
-			if (!is_scalar($value)) {
+			if (!is_scalar($value) && !is_null($value)) {
 				$normalized[$key] = $this->serializer->denormalize($value, $class, $format, $context);
 			}
 			else {

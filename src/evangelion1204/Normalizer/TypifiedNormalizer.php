@@ -82,7 +82,7 @@ class TypifiedNormalizer extends AbstractNormalizer
 			$ignored = in_array($attribute, $this->ignoredAttributes);
 
 			if ($allowed && !$ignored) {
-				if (!is_scalar($value)) {
+				if (!is_scalar($value) && !is_null($value)) {
 					$value = $this->serializer->denormalize($value, $class, $format, $context);
 				}
 				$object->$attribute = $value;

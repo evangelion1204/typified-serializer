@@ -42,8 +42,9 @@ class TypifiedNormalizerTest extends \PHPUnit_Framework_TestCase
 		$stdClass = new \stdClass();
 		$stdClass->prop1 = 1;
 		$stdClass->prop2 = 'string';
+		$stdClass->prop3 = null;
 
-		$stdClassNormalized = array('prop1' => 1, 'prop2' => 'string', TypifiedNormalizer::META_CLASS => 'stdClass');
+		$stdClassNormalized = array('prop1' => 1, 'prop2' => 'string', 'prop3' => null, TypifiedNormalizer::META_CLASS => 'stdClass');
 
 		$flatClass = new FlatClass();
 		$flatClass->setProtectedValue(1)->publicValue = 2;
