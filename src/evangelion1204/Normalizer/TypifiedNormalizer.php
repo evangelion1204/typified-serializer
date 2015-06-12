@@ -71,7 +71,9 @@ class TypifiedNormalizer extends AbstractNormalizer
 		$normalizedData = $this->prepareForDenormalization($data);
 
 		foreach ($normalizedData as $attribute => $value) {
-			if (!is_scalar($value) && !is_null($value)) {
+			$ignored = in_array($attribute, $this->ignoredAttributes);
+
+			if (!$ignored && !is_scalar($value) && !is_null($value)) {
 				$value = $this->serializer->denormalize($value, $class, $format, $context);
 			}
 			$normalizedData[$attribute] = $value;
@@ -137,5 +139,17 @@ class TypifiedNormalizer extends AbstractNormalizer
 
 		$this->propertyNormalizer->setSerializer($serializer);
 	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public function setIgnoredAttributes(array $ignoredAttributes)
+	{
+		parent::setIgnoredAttributes($ignoredAttributes);
+		$this->propertyNormalizer->setIgnoredAttributes($ignoredAttributes);
+
+		return $this;
+	}
+
 
 }

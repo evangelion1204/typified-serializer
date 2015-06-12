@@ -113,7 +113,7 @@ class TypifiedSerializerTest extends \PHPUnit_Framework_TestCase
 			array(array('key' => 'value'), array('key' => 'value')),
 			array(array('key' => null), array('key' => null)),
 			array(array(array('key' => null)), array(array('key' => null))),
-//			array(array(null), array(null)),
+			array(array(null), array(null)),
 			array($stdClass, $stdClassNormalized),
 			array($flatClass, $flatClassNormalized),
 			array(array($stdClass), array($stdClassNormalized)),
