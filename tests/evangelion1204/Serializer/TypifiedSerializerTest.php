@@ -12,10 +12,10 @@ namespace tests\evangelion1204\Normalizer;
 
 
 use evangelion1204\Normalizer\ArrayNormalizer;
-use evangelion1204\Normalizer\TypifiedNormalizer;
+use evangelion1204\Normalizer\StdClassNormalizer;
 use evangelion1204\Serializer\TypifiedSerializer;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
-use Symfony\Component\Serializer\Serializer;
+use Symfony\Component\Serializer\Normalizer\PropertyNormalizer;
 use tests\evangelion1204\Fixtures\DeepClass;
 use tests\evangelion1204\Fixtures\FlatClass;
 
@@ -27,7 +27,7 @@ class TypifiedSerializerTest extends \PHPUnit_Framework_TestCase
 	 */
 	public function testNormalize($src, $expected)
 	{
-		$serializer = new TypifiedSerializer(array(new TypifiedNormalizer()));
+		$serializer = new TypifiedSerializer(array(new PropertyNormalizer(), new StdClassNormalizer()));
 
 		$this->assertEquals($expected, $serializer->normalize($src));
 	}
@@ -37,7 +37,10 @@ class TypifiedSerializerTest extends \PHPUnit_Framework_TestCase
 	 */
 	public function testSerialize($src, $expected_array)
 	{
-		$serializer = new TypifiedSerializer(array(new TypifiedNormalizer()), array(new JsonEncoder()));
+		$serializer = new TypifiedSerializer(
+			array(new PropertyNormalizer(), new StdClassNormalizer()),
+			array(new JsonEncoder())
+		);
 
 		$this->assertEquals(json_encode($expected_array), $serializer->serialize($src, 'json'));
 	}
@@ -47,7 +50,9 @@ class TypifiedSerializerTest extends \PHPUnit_Framework_TestCase
 	 */
 	public function testDenormalize($expected, $src)
 	{
-		$serializer = new TypifiedSerializer(array(new TypifiedNormalizer(), new ArrayNormalizer()));
+		$serializer = new TypifiedSerializer(
+			array(new ArrayNormalizer(), new StdClassNormalizer(), new PropertyNormalizer())
+		);
 
 		$this->assertEquals($expected, $serializer->denormalize($src));
 	}
@@ -57,7 +62,10 @@ class TypifiedSerializerTest extends \PHPUnit_Framework_TestCase
 	 */
 	public function testDeserialize($expected, $src_array)
 	{
-		$serializer = new TypifiedSerializer(array(new TypifiedNormalizer(), new ArrayNormalizer()), array(new JsonEncoder()));
+		$serializer = new TypifiedSerializer(
+			array(new ArrayNormalizer(), new StdClassNormalizer(), new PropertyNormalizer()),
+			array(new JsonEncoder())
+		);
 
 		$this->assertEquals($expected, $serializer->deserialize(json_encode($src_array), null, 'json'));
 	}
@@ -69,14 +77,14 @@ class TypifiedSerializerTest extends \PHPUnit_Framework_TestCase
 		$stdClass->prop2 = 'string';
 		$stdClass->prop3 = null;
 
-		$stdClassNormalized = array('prop1' => 1, 'prop2' => 'string', 'prop3' => null, TypifiedNormalizer::META_CLASS => 'stdClass');
+		$stdClassNormalized = array('prop1' => 1, 'prop2' => 'string', 'prop3' => null, TypifiedSerializer::META_CLASS => 'stdClass');
 
 		$flatClass = new FlatClass();
 		$flatClass->setProtectedValue(1)->publicValue = 2;
 		$flatClassNormalized = array(
 			'protectedValue' => 1,
 			'publicValue' => 2,
-			TypifiedNormalizer::META_CLASS => 'tests\evangelion1204\Fixtures\FlatClass',
+			TypifiedSerializer::META_CLASS => 'tests\evangelion1204\Fixtures\FlatClass',
 		);
 
 		$parentClass = new \stdClass();
@@ -86,7 +94,7 @@ class TypifiedSerializerTest extends \PHPUnit_Framework_TestCase
 		$parentClassNormalized = array(
 			'prop3' => true,
 			'child' => $stdClassNormalized,
-			TypifiedNormalizer::META_CLASS => 'stdClass'
+			TypifiedSerializer::META_CLASS => 'stdClass'
 		);
 
 		$deepClass = new DeepClass();
@@ -99,13 +107,13 @@ class TypifiedSerializerTest extends \PHPUnit_Framework_TestCase
 		$deepClassNormalized = array(
 			'protectedValue' => 1,
 			'parent' => null,
-			TypifiedNormalizer::META_CLASS => 'tests\evangelion1204\Fixtures\DeepClass',
+			TypifiedSerializer::META_CLASS => 'tests\evangelion1204\Fixtures\DeepClass',
 		);
 
 		$nestedDeepClassNormalized = array(
 			'protectedValue' => 2,
 			'parent' => $deepClassNormalized,
-			TypifiedNormalizer::META_CLASS => 'tests\evangelion1204\Fixtures\DeepClass',
+			TypifiedSerializer::META_CLASS => 'tests\evangelion1204\Fixtures\DeepClass',
 		);
 
 		return array(
