@@ -101,7 +101,8 @@ class TypifiedNormalizer extends AbstractNormalizer
 			(is_object($data) && get_class($data) == 'stdClass') ||
 			!$data instanceof \Traversable &&
 			!is_array($data) &&
-			!is_scalar($data);
+			!is_scalar($data) &&
+			!is_null($data);
 	}
 
 	/**

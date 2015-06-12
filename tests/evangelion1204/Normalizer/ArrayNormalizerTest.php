@@ -42,6 +42,7 @@ class ArrayNormalizerTest extends \PHPUnit_Framework_TestCase
 			array(array(), array()),
 			array(array(1, 2), array(1, 2)),
 			array(array(null), array(null)),
+			array(array('key' => null), array('key' => null)),
 		);
 	}
 
