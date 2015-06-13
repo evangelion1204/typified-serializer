@@ -9,5 +9,5 @@ matrix:
 
 install: composer install
 
-script: phpunit -v --coverage-clover=coverage.clover
+script: phpunit --coverage-clover build/logs/clover.xml
 
