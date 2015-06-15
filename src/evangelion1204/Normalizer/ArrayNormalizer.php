@@ -11,11 +11,11 @@
 namespace evangelion1204\Normalizer;
 
 
+use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
-use Symfony\Component\Serializer\Normalizer\PropertyNormalizer;
-use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 class ArrayNormalizer extends AbstractNormalizer
 {
