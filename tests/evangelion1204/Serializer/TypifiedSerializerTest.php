@@ -16,6 +16,7 @@ use evangelion1204\Normalizer\StdClassNormalizer;
 use evangelion1204\Serializer\TypifiedSerializer;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\PropertyNormalizer;
+use tests\evangelion1204\Fixtures\ConstructorWithParamClass;
 use tests\evangelion1204\Fixtures\DeepClass;
 use tests\evangelion1204\Fixtures\FlatClass;
 
@@ -116,6 +117,12 @@ class TypifiedSerializerTest extends \PHPUnit_Framework_TestCase
 			TypifiedSerializer::META_CLASS => 'tests\evangelion1204\Fixtures\DeepClass',
 		);
 
+		$paramConstructorClass = new ConstructorWithParamClass(1);
+		$paramConstructorClassNormalized = array(
+			'property' => 1,
+			TypifiedSerializer::META_CLASS => 'tests\evangelion1204\Fixtures\ConstructorWithParamClass',
+		);
+
 		return array(
 			array(array(), array()),
 			array(array('key' => 'value'), array('key' => 'value')),
@@ -127,6 +134,7 @@ class TypifiedSerializerTest extends \PHPUnit_Framework_TestCase
 			array(array($stdClass), array($stdClassNormalized)),
 			array($deepClass, $deepClassNormalized),
 			array($nestedDeepClass, $nestedDeepClassNormalized),
+			array($paramConstructorClass, $paramConstructorClassNormalized),
 		);
 	}
 
