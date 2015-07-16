@@ -28,7 +28,7 @@ class TypifiedSerializerTest extends \PHPUnit_Framework_TestCase
 	 */
 	public function testNormalize($src, $expected)
 	{
-		$serializer = new TypifiedSerializer(array(new PropertyNormalizer(), new StdClassNormalizer()));
+		$serializer = new TypifiedSerializer(array(new PropertyNormalizer(), new StdClassNormalizer(), new ArrayNormalizer()));
 
 		$this->assertEquals($expected, $serializer->normalize($src));
 	}
@@ -39,7 +39,7 @@ class TypifiedSerializerTest extends \PHPUnit_Framework_TestCase
 	public function testSerialize($src, $expected_array)
 	{
 		$serializer = new TypifiedSerializer(
-			array(new PropertyNormalizer(), new StdClassNormalizer()),
+			array(new PropertyNormalizer(), new StdClassNormalizer(), new ArrayNormalizer()),
 			array(new JsonEncoder())
 		);
 
