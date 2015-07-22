@@ -35,7 +35,7 @@ class ArrayNormalizer extends AbstractNormalizer
 		$normalized = array();
 
 		foreach ($array  as $key => $value) {
-			if (in_array($key, $this->ignoredAttributes)) {
+			if (!is_numeric($key) && in_array($key, $this->ignoredAttributes)) {
 				continue;
 			}
 
