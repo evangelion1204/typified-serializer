@@ -11,11 +11,11 @@
 namespace evangelion1204\Normalizer;
 
 
+use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
-use Symfony\Component\Serializer\Normalizer\PropertyNormalizer;
-use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 class ArrayNormalizer extends AbstractNormalizer
 {
@@ -35,7 +35,7 @@ class ArrayNormalizer extends AbstractNormalizer
 		$normalized = array();
 
 		foreach ($array  as $key => $value) {
-			if (in_array($key, $this->ignoredAttributes)) {
+			if (!is_numeric($key) && in_array($key, $this->ignoredAttributes)) {
 				continue;
 			}
 
@@ -83,12 +83,7 @@ class ArrayNormalizer extends AbstractNormalizer
 				continue;
 			}
 
-			if (!is_scalar($value) && !is_null($value)) {
-				$normalized[$key] = $this->serializer->denormalize($value, $class, $format, $context);
-			}
-			else {
-				$normalized[$key] = $value;
-			}
+			$normalized[$key] = $value;
 		}
 
 		return $normalized;
@@ -107,7 +102,7 @@ class ArrayNormalizer extends AbstractNormalizer
 	 */
 	public function supportsDenormalization($data, $type, $format = null)
 	{
-		return is_array($data);
+		return is_array($data) && $type == null;
 	}
 
 }

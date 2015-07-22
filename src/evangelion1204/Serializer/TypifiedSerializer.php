@@ -16,13 +16,45 @@ use Symfony\Component\Serializer\Serializer;
 
 class TypifiedSerializer extends Serializer
 {
+	const META_CLASS = '__class__';
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public function normalize($data, $format = null, array $context = array())
+	{
+		$normalized = parent::normalize($data, $format, $context);
+
+		if (is_object($data)) {
+			$normalized[self::META_CLASS] = get_class($data);
+		}
+
+		return $normalized;
+	}
+
 	/**
 	 * {@inheritdoc}
 	 */
 	public function denormalize($data, $type = null, $format = null, array $context = array())
 	{
-		$type = isset($data[TypifiedNormalizer::META_CLASS]) ? $data[TypifiedNormalizer::META_CLASS] : $type;
+		if (!is_array($data) && !is_object($data)) {
+			return $data;
+		}
 
-		return parent::denormalize($data, $type, $format, $context);
+		$preprocessedData = array();
+
+		foreach ($data as $attribute => $attributeValue) {
+			if ($attribute === self::META_CLASS) {
+				continue;
+			}
+
+			$preprocessedData[$attribute] = $this->denormalize($attributeValue, null, $format, $context);
+		}
+
+		if (isset($data[self::META_CLASS])) {
+			$type = $data[self::META_CLASS];
+		}
+
+		return parent::denormalize($preprocessedData, $type, $format, $context);
 	}
 }
